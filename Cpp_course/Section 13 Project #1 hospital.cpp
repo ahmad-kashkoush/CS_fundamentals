@@ -1,10 +1,57 @@
 #include<iostream>
 #include<string>
 using namespace std;
-const int sections=21;
-const int p=5;
-string patients[21][5];
-string status[21][5];
+struct hospital_queue{
+    string patients[21];
+    int status[21];
+    int len=0;
+    int spec=0
+
+    hospital_queue(){
+        len=0;
+        spec=-1;
+
+    }
+    hospital_queue(int spec_){
+        len=0;
+        spec=spec_;
+    }
+    bool add_end(string pat, int st){
+        if(len==5)
+            return false;
+        patients[len+1]=pat;
+        status[len+1]=st;
+        len++;
+        return true;
+    }
+    void remove_front(){
+        if(len==0){
+            cout<<"no patients go have some rest doc\n";
+            return;
+        }
+        cout<<patients[0]<<", Go with the doctor\n";
+        for(int i=0;i<len-1;i++){
+            patients[i]=patients[sp][i+1];
+            status[i]=status[sp][i+1];
+        }
+        len--;
+
+    }
+    void print(){
+        if(len!=0){
+            cout<<"There'are "<<len<<"patients:\n";
+            for(int i=0;i<len;i++){
+                cout<<patients[i]<<" ";
+                cout<<(status[i]?"Urgent\n":"regular\n");
+            }
+            cout<<"\n";
+        }
+
+    }
+
+
+};
+
 int added[21];
 void print_section(int sp){
     if(added[sp]==0)
@@ -23,18 +70,15 @@ void print(){
 }
 void shift_left(int sp){
 
-    for(int i=0;i<added[sp]-1;i++){
-        patients[sp][i]=patients[sp][i+1];
-        status[sp][i]=status[sp][i+1];
-    }
-    added[sp]--;
+
+
 }
 void get_next(){
     cout<<"Enter Specilization : ";
     int sp; cin>>sp;
     if(added[sp]==0)
         return ;
-    cout<<patients[sp][0]<<", Go with the doctor\n";
+
     shift_left(sp);
 }
 void shift_right(int sp){
