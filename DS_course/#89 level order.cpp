@@ -21,28 +21,7 @@ public:
         if(right)
             right->print_inorder();
     }
-    // my way
-    void print_level_order_v2(){
-        queue<BinaryTree *> level, dq;
 
-        level.push(this);
-        while(true){
-            while(!level.empty()){
-                if(level.front()->left)
-                    dq.emplace(level.front()->left);
-                if(level.front()->right)
-                    dq.emplace(level.front()->right);
-                cout<<level.front()->data<<" ";
-                level.pop();
-            }cout<<el;
-            if(dq.empty())
-                return;
-            while(!dq.empty()){
-                level.push(dq.front());
-                dq.pop();
-            }
-        }
-    }
     // doc way
     void print_level_order(){
         queue<BinaryTree*> nodes;
