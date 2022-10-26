@@ -6,7 +6,7 @@
 #define ll long long
 #define all(s)  s.begin(), s.end()
 using namespace std;
-
+// in this file i'll call it a binary tree but my operations will BST
 class BinaryTree{
 private:
     int data{};
@@ -23,35 +23,6 @@ public:
 
     }
 
-
-    BinaryTree(deque<int> &pre, deque<int> &in, int l=0, int r=-1){
-        if(r==-1)
-            r=(int)in.size()-1;
-        data=pre[0];
-        pre.pop_front();
-        for(int split=l;split<=r;split++){
-            if(in[split]==data){
-                if(split>l)left=new BinaryTree(pre, in, l, split-1);
-                if(split<r)right=new BinaryTree(pre,in, split+1, r);
-                break;
-            }
-        }
-
-
-    }
-    BinaryTree(queue<pair<int, bool>> &q){
-        if(q.empty())
-            return;
-        data=q.front().first;
-        bool leaf=q.front().second;
-        q.pop();
-        if(!leaf){
-            left= new BinaryTree(q);
-          //  q.pop();// don't delete because it will be deleted from line 44
-            right= new BinaryTree(q);
-//            q.pop();
-        }
-    }
         void print_level_order(){
         queue<BinaryTree*> nodes;
         nodes.push(this);
@@ -72,6 +43,20 @@ public:
             cout<<el;
 
         }
+    }
+    void Insert(int value){
+        if(value<data){
+            if(!left)
+                left= new BinaryTree(value);
+            else left->Insert(value);
+
+        }else if(value>data){
+            if(!right)
+                right= new BinaryTree(value);
+            else right->Insert(value);
+        }
+        // else will be found so don't create
+        // in this tree we're creating set
     }
     void add(vector<int> value, string direction){
         assert(value.size()==direction.size());
@@ -126,18 +111,17 @@ public:
 
 
 };
-
+// A binary search tree is a tree which it's inorder representation is sorted
 
 
 int main(){
-    BinaryTree bt(1), tree(2);
-    bt.add({2}, "R");
-    bt.add({5}, "L");
-//    bt.print_inorder();
-    tree.add({3}, "L");
-    tree.add({13, 7}, "RR");
-    tree.add({13, 8}, "RL");
-    tree.print_inorder();
+    BinaryTree test1(50);
+    test1.Insert(45);// should automaticly on the left
+    test1.Insert(60);
+    test1.Insert(55);
+    test1.print_level_order();
+    test1.print_inorder();
 
 
 }
+
