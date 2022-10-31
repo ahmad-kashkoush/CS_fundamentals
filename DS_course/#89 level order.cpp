@@ -1,9 +1,6 @@
 
-#include<iostream>
-#include<vector>
+#include<bits/stdc++.h>
 #include<cassert>
-#include<stack>
-#include<queue>
 #define el "\n"
 using namespace std;
 // we can do BT using struct of node like linkedlist
@@ -25,6 +22,7 @@ public:
     // doc way
     void print_level_order(){
         queue<BinaryTree*> nodes;
+        priority_queue<int> pq;
         nodes.push(this);
         int level=0;
         while(!nodes.empty()){
@@ -36,9 +34,14 @@ public:
                     nodes.push(tmp->left);
                 if(tmp->right)
                     nodes.push(tmp->right);
-                cout<<nodes.front()->data<<" ";
+                pq.push(nodes.front()->data);
                 nodes.pop();
             }
+            while(!pq.empty()){
+                cout<<pq.top()<<" ";
+                pq.pop();
+            }
+
             level++;
             cout<<el;
 
@@ -83,15 +86,15 @@ public:
 };
 
 int main(){
-    BinaryTree bt(1), tree(2), p3(2), BT4(2);
+    BinaryTree bt(1), tree(2), p3(2), BT4(25);
 
 //    p3.add({3, 5, 8, 6, 7, 15},"LLRRLR");
 //    p3.add({13,7}, "RR");
 //    p3.add({13,8}, "RL");
 //    p3.print_level_order();
-      BT4.add({4, 8}, "LL");
-      BT4.add({3, 6}, "RL");
-      BT4.add({3, 5}, "RR");
+      BT4.add({3, 5}, "LL");
+      BT4.add({7, 30}, "RL");
+      BT4.add({7, 6}, "RR");
       BT4.print_level_order();
 //    cout<<el;
 //    p3.traverse_left_boundary();
