@@ -47,12 +47,35 @@ struct phoneEntry{
 // building our hash table
 class PhoneHashTable{
 private:
-    int table_size;// size of bucket
+    int table_size, total_elements;// size of bucket
+    double loadFactorLimit;// added/numberOfbuckets the less the better
     vector<vector<phoneEntry> > table;
 public:
     PhoneHashTable(int Size){
         table_size=Size;
+
         table.resize(table_size);
+        total_elements=0;
+    }
+    // I rehash if added/(sizeOfArray or number of buckets)>load factor limit
+
+    void rehashing(){
+        double cur_load_factor=(double)total_elements/table_size;
+        if(cur_load_factor<loadFactorLimit)
+            return ;
+        PhoneHashTable new_table(2*table_size, loadFactorLimit);
+        for(int i=0;i<table_size;i++){
+            if(table[i].size()==0)
+                continue;
+
+            for(int ele=0;ele<table[i].size();i++)
+                new_table.put(table[i][ele]);
+        }
+        table_size*=2;
+        table=new_table.table;
+
+        printAll();
+
     }
     void put(phoneEntry phone){
         int index=phone.Hash()%table_size;// this way i'm getting the bucket || hash code
@@ -132,10 +155,4 @@ int main() {
 
 
 }
-
-
-
-
-
-
 

@@ -30,6 +30,7 @@ int hash_string(string str, int n=mod) {
 		sum = (sum * 62 + getNum(str[i])) % nn;
 	return sum % nn;
 }
+
 struct phoneEntry{
     string name, PhoneNum;
     const  static int internal_limit=INT_MAX;
@@ -40,72 +41,67 @@ struct phoneEntry{
         cout<<"("<<name<<", "<<PhoneNum<<")";
     }
     int Hash(){
-        return hash_string(name, internal_limit);
+        return hash_string(name, mod);
     }
 
 };
+
 // building our hash table
 class PhoneHashTable{
 private:
+    struct LinkedPhoneEntry{
+        phoneEntry item;
+        LinkedPhoneEntry *next {};
+
+        LinkedPhoneEntry(phoneEntry item):item(item){}
+    };
     int table_size;// size of bucket
-    vector<vector<phoneEntry> > table;
+    vector<LinkedPhoneEntry*> table;
 public:
     PhoneHashTable(int Size){
         table_size=Size;
         table.resize(table_size);
     }
     void put(phoneEntry phone){
-        int index=phone.Hash()%table_size;// this way i'm getting the bucket || hash code
-        // is we've the same key, then we'll just update, else push
-        for(int i=0;i<table[index].size();i++){
-            if(table[index][i].name==phone.name){
-                table[index][i] = phone;// update and exit
+        int index=phone.Hash()%table_size;
+
+        if(!table[index]){
+            table[index]= new LinkedPhoneEntry(phone);
+            return;
+        }
+
+
+        LinkedPhoneEntry *cur=table[index];
+        for(;cur->next;cur=cur->next){
+            if(cur->item.name==phone.name){
+                cur->item = phone;// update and exit
                 return;
             }
 
         }
+        if(cur->item.name==phone.name)
+            cur->item=phone;
+        else
+            cur->next=new LinkedPhoneEntry(phone);
+
         // if there's no key like that then push it
-        table[index].push_back(phone);
+
     }
-    // if found remove it and return true, else return false
-    bool Remove(phoneEntry phone){
-        int index=phone.Hash()%table_size;
-        for(int i=0;i<table[index].size();i++){
-            if(table[index][i].name==phone.name){
-                //! make it last element and the pop it from the vector
-                swap(table[index][i], table[index].back());
-                table[index].pop_back();
-                return true;
-            }
-        }
-        return false;
-    }
-    // get to update the argument if found
-    int get(phoneEntry &phone){
-        int index=phone.Hash()%table_size;
-        for(int i=0;i<table[index].size();i++){
-            if(table[index][i].name==phone.name){
-                phone=table[index][i];
-                return true;
-            }
-        }
-        return false;
-    }
+
     void printAll(){
-        for(int i=0;i<table_size;i++){
-            if(table[i].size()==0)
+        for(int hash=0;hash<table_size;hash++){
+            if(!table[hash])
                 continue;
-            cout<<"Hash Code:"<< i<<": ************\n";
-            for(auto x:table[i]){
-                x.print();
-                cout<<el;
-            }
-
+            LinkedPhoneEntry *cur=table[hash];
+            cout<<"Hash "<<hash<<" : ";
+            for(;cur;cur=cur->next)
+                cur->item.print();
+            cout<<el;
         }
     }
-
 
 };
+
 void simulation(){
     PhoneHashTable table(3);
 	table.put(phoneEntry("mostafa", "604-401-120"));
@@ -116,7 +112,7 @@ void simulation(){
 	table.put(phoneEntry("belal", "604-401-550"));
 	table.put(phoneEntry("john", "604-401-223"));
 
-    table.Remove(phoneEntry("john", "604-401-223"));
+
 	table.printAll();
 
 }
@@ -132,6 +128,7 @@ int main() {
 
 
 }
+
 
 
 

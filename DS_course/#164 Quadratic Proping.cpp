@@ -40,7 +40,7 @@ struct phoneEntry{
         cout<<"("<<name<<", "<<PhoneNum<<")";
     }
     int Hash(){
-        return hash_string(name, internal_limit);
+        return hash_string(name, mod);
     }
 
 };
@@ -48,66 +48,86 @@ struct phoneEntry{
 class PhoneHashTable{
 private:
     int table_size;// size of bucket
-    vector<vector<phoneEntry> > table;
+    vector<phoneEntry *> table;
+    phoneEntry  *deleted= new phoneEntry("","");
 public:
+        void rehashing(){
+
+        PhoneHashTable new_table(2*table_size);
+        for(int i=0;i<table_size;i++){
+
+
+            for(int ele=0;ele<table[i].size();i++)
+                new_table.put(table[i][ele]);
+        }
+        table_size*=2;
+        table=new_table.table;
+
+        printAll();
+
+    }
     PhoneHashTable(int Size){
         table_size=Size;
         table.resize(table_size);
     }
-    void put(phoneEntry phone){
-        int index=phone.Hash()%table_size;// this way i'm getting the bucket || hash code
-        // is we've the same key, then we'll just update, else push
-        for(int i=0;i<table[index].size();i++){
-            if(table[index][i].name==phone.name){
-                table[index][i] = phone;// update and exit
+
+    void  put(phoneEntry phone){
+        int idx=phone.Hash()%table_size;
+        int original=idx, step=0;
+
+        do{
+            if(table[idx]==deleted||!table[idx]){
+                table[idx]=new phoneEntry(phone.name, phone.PhoneNum);
+                return;
+            }else if(table[idx]->name==phone.name){
+                table[idx]->PhoneNum=phone.PhoneNum;
                 return;
             }
+            step++;
+            idx=(idx+step*step)%table_size;
+        }while(idx!=original);
+        rehash();
+        put(phone);
+    }
+
+    bool Remove(phoneEntry phone){
+        int idx=phone.Hash()%table_size;
+
+        for(int step=0;step<table_size;step++){
+            if(!table[idx])
+                return false;
+            if(table[idx]->name==phone.name){
+                delete table[idx];
+                table[idx]=deleted;
+                return true;
+            }
+
+
+            idx=(idx+1)%table_size;
 
         }
-        // if there's no key like that then push it
-        table[index].push_back(phone);
+        return true;
     }
-    // if found remove it and return true, else return false
-    bool Remove(phoneEntry phone){
-        int index=phone.Hash()%table_size;
-        for(int i=0;i<table[index].size();i++){
-            if(table[index][i].name==phone.name){
-                //! make it last element and the pop it from the vector
-                swap(table[index][i], table[index].back());
-                table[index].pop_back();
-                return true;
-            }
-        }
-        return false;
-    }
-    // get to update the argument if found
-    int get(phoneEntry &phone){
-        int index=phone.Hash()%table_size;
-        for(int i=0;i<table[index].size();i++){
-            if(table[index][i].name==phone.name){
-                phone=table[index][i];
-                return true;
-            }
-        }
-        return false;
-    }
+
+
     void printAll(){
         for(int i=0;i<table_size;i++){
-            if(table[i].size()==0)
-                continue;
-            cout<<"Hash Code:"<< i<<": ************\n";
-            for(auto x:table[i]){
-                x.print();
-                cout<<el;
-            }
 
+            if(table[i]==deleted)
+                cout<<"X";
+            else if(!table[i])
+                cout<<"E";
+            else
+                table[i]->print();
+            cout<<el;
         }
+
     }
 
 
 };
 void simulation(){
-    PhoneHashTable table(3);
+    PhoneHashTable table(10);
 	table.put(phoneEntry("mostafa", "604-401-120"));
 	table.put(phoneEntry("mostafa", "604-401-777"));	// update
 	table.put(phoneEntry("ali", "604-401-343"));
@@ -116,7 +136,8 @@ void simulation(){
 	table.put(phoneEntry("belal", "604-401-550"));
 	table.put(phoneEntry("john", "604-401-223"));
 
-    table.Remove(phoneEntry("john", "604-401-223"));
+//	table.Remove(phoneEntry("mostafa", "604-401-120"));
+//    table.Remove(phoneEntry("john", "604-401-223"));
 	table.printAll();
 
 }
@@ -132,6 +153,7 @@ int main() {
 
 
 }
+
 
 
 
